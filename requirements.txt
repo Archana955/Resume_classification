@@ -70,7 +70,6 @@ wincertstore==0.2
 zipp==3.8.1
 nltk==3.8.1
 spacy==3.4.0
-tensorboard==2.10.1
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.1
 tensorflow==2.10.1
