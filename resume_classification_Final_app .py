@@ -93,8 +93,8 @@ matcher = Matcher(nlp.vocab)
 
     
 
-loaded_model = pickle.load(open("final_model.sav",'rb'))
-loaded_vect = pickle.load(open("tfidf_vec.sav",'rb'))
+loaded_model = pickle.load(open("C:/Users/INDIA/resume_classification/final_model.sav", 'rb'))
+loaded_vect = pickle.load(open("C:/Users/INDIA/resume_classification/tfidf_vec.sav",'rb'))
 page = st.sidebar.radio("navigate",("Resume classification","Resume Screening"))
 with st.container():
     st.header("Resume Parser App")
