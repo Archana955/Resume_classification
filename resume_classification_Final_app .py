@@ -10,6 +10,7 @@ import pandas as pd
 import streamlit as st
 import pickle
 import warnings
+warnings.filterwarnings("ignore")
 import re
 import nltk
 from nltk.tokenize import word_tokenize
@@ -27,6 +28,10 @@ import io
 import tempfile
 import subprocess
 from docx import Document
+import docx
+from docx.api import Document
+
+
 
 
 nltk.data.path.append("C:/Users/INDIA/AppData/Roaming/nltk_data")
@@ -99,18 +104,27 @@ with st.container():
 st.markdown('<hr>', unsafe_allow_html=True)
 st.sidebar.title("Input data") 
 
+
+def convert_doc_to_docx(doc_file):
+    docx_file = os.path.splittext(doc_file.name)[0] + '.docx'
+    doc = docx.Document(doc_file)
+    doc.save(docx_file)
+    return docx_file
+
+
 def convert_resume_to_text(file):
     if file.name.endswith('.docx'):
         text = docx2txt.process(file)
         return text
     elif file.name.endswith('.doc'):
-        # Converting .doc file to .docx
-        docx_file = file.name + 'x'
-        os.system('antiword "' + file.name + '" > "' + docx_file + '"')
-        with open(docx_file) as f:
-            text = f.read()
-        os.remove(docx_file)
-        return text
+        doc_file = file.name
+        docx_file = convert_doc_to_docx(doc_file)
+        if docx_file:
+            document = docx.Document(docx_file)
+            paragraphs = [p.text for p in document.paragraphs]
+            text = "\n".join(paragraphs)
+            os.remove(docx_file)
+            return text
     elif file.name.endswith('.pdf'):
         with tempfile.NamedTemporaryFile(suffix='.pdf') as temp_file:
             
@@ -214,7 +228,7 @@ def extract_resume_summary(resume_text, max_length=100):
     t5_summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
     
     return t5_summary
-@st.cache
+@st.cache(allow_output_mutation=True)
 def load_model():
     model = KeyBERT("distilbert-base-nli-mean-tokens")
     return model
@@ -297,7 +311,7 @@ if page == "Resume classification":
     
     def main():
        st.sidebar.error("Supports DOCX, DOC, PDF, TXT")
-    uploaded_files = st.sidebar.file_uploader("Upload resumes", accept_multiple_files=True)
+    uploaded_files = st.sidebar.file_uploader("Upload resumes", accept_multiple_files=True,type = ['.doc','.docx','.pdf','.txt'])
     
     if uploaded_files:
         all_text = []
