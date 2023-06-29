@@ -123,22 +123,14 @@ def convert_doc_to_docx(file):
         encodings = ['utf-8', 'latin-1']  # Specify the encodings to try
         for encoding in encodings:
             try:
-                with open(docx_file, encoding=encoding) as f:
-                    text = f.read()
+                with open(docx_file, 'rb') as f:  # Open the file in binary mode
+                    text = f.read().decode(encoding)  # Decode the bytes using the specified encoding
                 break
             except UnicodeDecodeError:
                 continue
         else:
             print(f'Error: Unable to decode the file using supported encodings: {encodings}')
             text = ''
-
-        # Remove the temporary .docx file
-        os.remove(docx_file)
-
-        return text
-    else:
-        print('Error: Unsupported file format')
-        return ''
 
 #extracting name from the given resume 
 # from spacy.matcher import Matcher
