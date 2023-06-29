@@ -105,27 +105,30 @@ st.markdown('<hr>', unsafe_allow_html=True)
 st.sidebar.title("Input data") 
 
 
-import chardet
-
 def convert_doc_to_docx(file):
     if file.name.endswith('.docx'):
         text = docx2txt.process(file)
         return text
     elif file.name.endswith('.doc'):
         # Converting .doc file to .docx
-        docx_file = 'temp.docx'
+        doc_file = file.name
+        docx_file = doc_file + 'x'
 
         # Save the uploaded .doc file as .docx using python-docx
         with open(docx_file, 'wb') as f:
             f.write(file.read())
 
         # Read the converted .docx file
-        detected_encoding = detect_encoding(docx_file)
-        if detected_encoding:
-            with open(docx_file, encoding=detected_encoding) as f:
-                text = f.read()
+        encodings = ['utf-8', 'latin-1', 'cp1254']  # Specify the encodings to try
+        for encoding in encodings:
+            try:
+                with open(docx_file, encoding=encoding) as f:
+                    text = f.read()
+                break
+            except UnicodeDecodeError:
+                continue
         else:
-            print(f'Error: Unable to detect the file encoding')
+            print(f'Error: Unable to decode the file using supported encodings: {encodings}')
             text = ''
 
         # Remove the temporary .docx file
@@ -136,15 +139,6 @@ def convert_doc_to_docx(file):
         print('Error: Unsupported file format')
         return ''
 
-
-def detect_encoding(file_path):
-    with open(file_path, 'rb') as f:
-        raw_data = f.read()
-
-    detected_result = chardet.detect(raw_data)
-    detected_encoding = detected_result['encoding']
-
-    return detected_encoding
 
 
 #extracting name from the given resume 
